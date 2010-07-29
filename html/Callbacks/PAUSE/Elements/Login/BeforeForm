@@ -1,0 +1,4 @@
+<h3><% loc('Have a <em>PAUSE</em> account?') |n %></h3>
+<p>
+<% loc('You can use the form below to log in with your PAUSE userid and password.') %>
+</p>
