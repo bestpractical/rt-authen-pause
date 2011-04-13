@@ -7,7 +7,7 @@ use LWP::UserAgent;
 use HTTP::Request;
 
 # somebody is logged in
-return if $session{'CurrentUser'};
+return if $session{'CurrentUser'} and $session{'CurrentUser'}->Id;
 # no credentials
 return unless defined $user && defined $pass;
 # we don't auth root
