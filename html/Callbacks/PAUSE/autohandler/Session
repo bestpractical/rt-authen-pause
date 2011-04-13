@@ -42,6 +42,8 @@ unless ( $res->code == 200 ) {
     # different here or just let it fall through to the default
     # autohandler to error out?
 
+    $RT::Logger->warning("PAUSE authentication failed with " . $res->code);
+
     # Other code => oops, PAUSE is down, or something
     return;
 }
