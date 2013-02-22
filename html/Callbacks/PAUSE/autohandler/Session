@@ -10,8 +10,8 @@ use HTTP::Request;
 return if $session{'CurrentUser'} and $session{'CurrentUser'}->Id;
 # no credentials
 return unless defined $user && defined $pass;
-# we don't auth root
-return if lc $user eq 'root';
+# we don't auth root@localhost, which should be the local RT root
+return if lc $user eq 'root@localhost';
 
 $user = uc $user;
 
