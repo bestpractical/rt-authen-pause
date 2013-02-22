@@ -6,6 +6,19 @@ $pass => undef
 use LWP::UserAgent;
 use HTTP::Request;
 
+my $success = sub {
+    my $next = $session{'NextPage'}->{ $ARGS{'next'} || "" };
+       $next = $next->{'url'} if ref $next;
+
+    RT::Interface::Web::InstantiateNewSession();
+    $session{'CurrentUser'} = $_[0];
+
+    RT::Interface::Web::Redirect( $next )
+        if $next and $m->request_comp->path eq '/NoAuth/Login.html';
+
+    return;
+};
+
 # somebody is logged in
 return if $session{'CurrentUser'} and $session{'CurrentUser'}->Id;
 # no credentials
@@ -26,8 +39,7 @@ unless ( $cu->id ) {
 
 # try to auth against local DB
 if ( $cu->IsPassword( $pass ) ) {
-    $session{'CurrentUser'} = $cu;
-    return;
+    return $success->($cu);
 }
 
 # no luck with local try PAUSE's auth
@@ -48,9 +60,6 @@ unless ( $res->code == 200 ) {
     return;
 }
 
-# Successful login
-$session{'CurrentUser'} = $cu;
-
 # we'll cache the password, but we'll use system user as the current
 # user may have no right to modify his own password
 my $user_obj = RT::User->new( $RT::SystemUser );
@@ -70,4 +79,6 @@ unless ( $status ) {
     $RT::Logger->debug("Updated ". $user ."'s password with one from PAUSE");
 }
 
+# Successful login
+return $success->($cu);
 </%INIT>
