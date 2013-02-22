@@ -1,5 +1,6 @@
-html/Callbacks/PAUSE/autohandler/Auth
+html/Callbacks/PAUSE/autohandler/Session
 html/Callbacks/PAUSE/Elements/Login/BeforeForm
+html/Callbacks/PAUSE/Elements/Login/Default
 inc/Module/AutoInstall.pm
 inc/Module/Install.pm
 inc/Module/Install/AutoInstall.pm
