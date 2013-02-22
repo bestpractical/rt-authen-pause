@@ -5,19 +5,6 @@ $pass => undef
 <%INIT>
 use LWP::UserAgent;
 
-my $success = sub {
-    my $next = $session{'NextPage'}->{ $ARGS{'next'} || "" };
-       $next = $next->{'url'} if ref $next;
-
-    RT::Interface::Web::InstantiateNewSession();
-    $session{'CurrentUser'} = $_[0];
-
-    RT::Interface::Web::Redirect( $next )
-        if $next and $m->request_comp->path eq '/NoAuth/Login.html';
-
-    return;
-};
-
 # somebody is logged in
 return if $session{'CurrentUser'} and $session{'CurrentUser'}->Id;
 # no credentials
@@ -27,56 +14,40 @@ return if lc $user eq 'root@localhost';
 
 $user = uc $user;
 
-# Try to load the user by PAUSE_ID@cpan.org
+# Try to load the user by PAUSE_ID
 my $cu = RT::CurrentUser->new();
 $cu->LoadByName( $user );
 unless ( $cu->id ) {
     $RT::Logger->warning("No user '$user' in DB, broken import of users from pause?");
     return;
 }
-# we get the user, great
 
-# try to auth against local DB
-if ( $cu->IsPassword( $pass ) ) {
-    return $success->($cu);
-}
-
-# no luck with local try PAUSE's auth
-my $ua  = LWP::UserAgent->new();
+# Proxy to PAUSE's auth
+my $ua = LWP::UserAgent->new( timeout => 5 );
 $ua->credentials('pause.perl.org:443', 'PAUSE', $user, $pass);
 
 my $res = $ua->get('https://pause.perl.org/pause/authenquery');
 
-unless ( $res->code == 200 ) {
-    # if 401 then no dice, login failed... do we want to do something
-    # different here or just let it fall through to the default
-    # autohandler to error out?
+# Successful login
+if ($res->code == 200) {
+    $RT::Logger->info("PAUSE login by $user from $ENV{REMOTE_ADDR}");
 
+    my $next = $session{'NextPage'}->{ $ARGS{'next'} || "" };
+       $next = $next->{'url'} if ref $next;
+
+    RT::Interface::Web::InstantiateNewSession();
+    $session{'CurrentUser'} = $cu;
+
+    RT::Interface::Web::Redirect( $next )
+        if $next and $m->request_comp->path eq '/NoAuth/Login.html';
+} else {
     $RT::Logger->warning("PAUSE authentication failed with " . $res->code);
 
-    # Other code => oops, PAUSE is down, or something
-    return;
+    # If 401 then no dice, login failed.
+    # Other code => oops, PAUSE is down, or something.
+    $session{"Actions"}{""} = [loc("Unable to contact PAUSE for authentication (status [_1])", $res->code)]
+        if $res->code != 401;
 }
 
-# we'll cache the password, but we'll use system user as the current
-# user may have no right to modify his own password
-my $user_obj = RT::User->new( $RT::SystemUser );
-$user_obj->Load( $cu->id );
-unless ( $user_obj->id ) {
-    $RT::Logger->crit("Couldn't load user #". $cu->id);
-    return;
-}
-
-my ($status, $msg) = $user_obj->SetPassword( $pass );
-unless ( $status ) {
-    $RT::Logger->error(
-        "Couldn't set users password: $msg."
-        ." Next time we'll have to ask PAUSE service again"
-    );
-} else {
-    $RT::Logger->debug("Updated ". $user ."'s password with one from PAUSE");
-}
-
-# Successful login
-return $success->($cu);
+return;
 </%INIT>
