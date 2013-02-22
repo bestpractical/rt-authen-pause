@@ -20,7 +20,6 @@ no_index:
     - html
     - inc
 requires:
-  HTTP::Request: 0
   LWP::UserAgent: 0
 resources:
   license: http://opensource.org/licenses/gpl-license.php

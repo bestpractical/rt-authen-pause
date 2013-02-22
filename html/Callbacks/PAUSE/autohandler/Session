@@ -4,7 +4,6 @@ $pass => undef
 </%ARGS>
 <%INIT>
 use LWP::UserAgent;
-use HTTP::Request;
 
 my $success = sub {
     my $next = $session{'NextPage'}->{ $ARGS{'next'} || "" };
@@ -46,8 +45,7 @@ if ( $cu->IsPassword( $pass ) ) {
 my $ua  = LWP::UserAgent->new();
 $ua->credentials('pause.perl.org:443', 'PAUSE', $user, $pass);
 
-my $req = HTTP::Request->new(GET => 'https://pause.perl.org/pause/authenquery');
-my $res = $ua->request($req);
+my $res = $ua->get('https://pause.perl.org/pause/authenquery');
 
 unless ( $res->code == 200 ) {
     # if 401 then no dice, login failed... do we want to do something

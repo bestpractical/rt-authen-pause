@@ -9,7 +9,6 @@ version_from    ('lib/RT/Authen/PAUSE.pm');
 license         ('GPL version 2');
 
 requires        ('LWP::UserAgent');
-requires        ('HTTP::Request');
 
 auto_install();
 
