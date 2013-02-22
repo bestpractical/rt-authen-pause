@@ -9,7 +9,7 @@ use HTTP::Request;
 # somebody is logged in
 return if $session{'CurrentUser'} and $session{'CurrentUser'}->Id;
 # no credentials
-return unless defined $user && defined $pass;
+return unless defined $user and length $user and defined $pass;
 # we don't auth root@localhost, which should be the local RT root
 return if lc $user eq 'root@localhost';
 
