@@ -16,7 +16,7 @@ changes back to PAUSE.
 
 package RT::Authen::PAUSE;
 
-our $VERSION = '0.10';
+our $VERSION = '0.11';
 
 1;
 
