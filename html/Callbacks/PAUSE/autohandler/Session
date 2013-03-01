@@ -41,11 +41,11 @@ if ($res->code == 200) {
     RT::Interface::Web::Redirect( $next )
         if $next and $m->request_comp->path eq '/NoAuth/Login.html';
 } else {
-    $RT::Logger->warning("PAUSE authentication failed with " . $res->code);
+    $RT::Logger->warning("PAUSE authentication failed with " . $res->status_line);
 
     # If 401 then no dice, login failed.
     # Other code => oops, PAUSE is down, or something.
-    $session{"Actions"}{""} = [loc("Unable to contact PAUSE for authentication (status [_1])", $res->code)]
+    $session{"Actions"}{""} = [loc("Unable to contact PAUSE for authentication ([_1])", $res->status_line)]
         if $res->code != 401;
 }
 
