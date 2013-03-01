@@ -4,6 +4,7 @@ $pass => undef
 </%ARGS>
 <%INIT>
 use LWP::UserAgent;
+use Encode qw/encode_utf8/;
 
 # somebody is logged in
 return if $session{'CurrentUser'} and $session{'CurrentUser'}->Id;
@@ -24,7 +25,7 @@ unless ( $cu->id ) {
 
 # Proxy to PAUSE's auth
 my $ua = LWP::UserAgent->new( timeout => 5 );
-$ua->credentials('pause.perl.org:443', 'PAUSE', $user, $pass);
+$ua->credentials('pause.perl.org:443', 'PAUSE', $user, encode_utf8($pass));
 
 my $res = $ua->get('https://pause.perl.org/pause/authenquery');
 
