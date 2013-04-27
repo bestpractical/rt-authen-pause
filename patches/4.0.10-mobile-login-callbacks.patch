@@ -1,0 +1,51 @@
+From 04387ee2c6b2232df41d8ea0986e26edee74fa0c Mon Sep 17 00:00:00 2001
+From: Thomas Sibley <trs@bestpractical.com>
+Date: Mon, 11 Mar 2013 16:35:43 -0700
+Subject: [PATCH] Add callbacks for the mobile login form equivalent to the
+ non-mobile form
+
+---
+ share/html/m/_elements/login | 9 +++++++++
+ 1 file changed, 9 insertions(+)
+
+diff --git a/share/html/m/_elements/login b/share/html/m/_elements/login
+index 5fbdb9a..f6213d0 100644
+--- a/share/html/m/_elements/login
++++ b/share/html/m/_elements/login
+@@ -45,6 +45,7 @@
+ %# those contributions and any derivatives thereof.
+ %#
+ %# END BPS TAGGED BLOCK }}}
++% $m->callback( %ARGS, CallbackName => 'Header' );
+ <&| /m/_elements/wrapper, show_home_button => 0 &>
+ <style>
+ <& /m/_elements/raw_style &>
+@@ -58,6 +59,8 @@
+     actions     => $actions,
+ &>
+ 
++% $m->callback( %ARGS, CallbackName => 'BeforeForm' );
++
+ <div id="login-box">
+ <&| /Widgets/TitleBox, title => loc('Login'), hideable => 0 &>
+ 
+@@ -87,10 +90,16 @@ if (window.location.hash) {
+     }
+ }
+ </script>
++
++% $m->callback( %ARGS );
++
+ </form>
+ % }
+ </&>
+ </div><!-- #login-box -->
++
++% $m->callback( %ARGS, CallbackName => 'AfterForm' );
++
+ </div><!-- #login-body -->
+ <& /m/_elements/full_site_link &>
+ </&>
+-- 
+1.7.11.3
+
